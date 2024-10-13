@@ -1,17 +1,23 @@
 const express = require('express');
-const morgan = require('morgan');
-
 const app = express();
-app.use(express.json()); // Middleware для парсинга JSON
+const morgan = require('morgan');
+const cors = require('cors')
 
-// Кастомный токен для логирования содержимого body.content
-morgan.token('body-content', (req) => {
-  console.log('Body content:', req.body.content); // Для отладки
-  return req.body.content ? req.body.content : 'нет контента';
+app.use(express.json()); 
+const corsOptions = {
+origin: 'http://localhost:5173',
+}
+
+app.use(cors(corsOptions))
+
+
+morgan.token('body-content', (request) => {
+  console.log('Body content:', request.body.content); 
+  return request.body.content ? request.body.content : 'нет контента';
 });
 
-// Используем кастомный токен в формате 'common'
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms -  {:body-content}'));
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms - body-content: :body-content'));
 
 let notes = [
   {
@@ -31,32 +37,57 @@ let notes = [
   }
 ];
 
-app.get('/api/notes', (req, res) => {
-  res.json(notes);
+app.get('/', (request, response) => {
+  response.send('<h1> Hello World! </h1>');   
 });
 
-app.post('/api/notes', (req, res) => {
-  const body = req.body;
+app.get('/api/notes', (request, response) => {
+  response.json(notes);   
+});
+
+app.get('/api/notes/:id', (request, response) => {
+  const id = request.params.id;
+  const note = notes.find(note => note.id === id);
+  response.json(note);   
+});
+
+app.delete('/api/notes/:id', (request, response) => {
+  const id = request.params.id;
+  notes = notes.filter(note => note.id !== id);
+
+  response.status(404).end();   
+});
+
+const generateId = () => {
+  const maxId = notes.length > 0
+    ? Math.max(...notes.map(n => Number(n.id)))
+    : 0;
+  return (maxId + 1).toString();
+};
+
+
+app.post('/api/notes', (request, response) => {
+  const body = request.body;
 
   console.log('Received POST request body:', body); // Дополнительный вывод
 
   if (!body.content) {
-    return res.status(400).json({
+    return response.status(400).json({
       error: 'content is missing'
     });
   }
 
   const newNote = {
-    id: (notes.length + 1).toString(),
+    id: generateId(),
     content: body.content,
-    important: body.important || false,
+    important: Boolean(body.important) || false,
   };
 
-  notes.push(newNote);
-  res.json(newNote);
+  notes.concat(newNote);
+  response.json(newNote);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
