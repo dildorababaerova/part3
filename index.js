@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const morgan = require('morgan');
+// const morgan = require('morgan');
 const cors = require('cors')
 
 app.use(express.json()); 
@@ -9,15 +9,15 @@ origin: 'http://localhost:5173',
 }
 
 app.use(cors(corsOptions))
+app.use(express.static('dist'))
+
+// morgan.token('body-content', (request) => {
+//   console.log('Body content:', request.body.content); 
+//   return request.body.content ? request.body.content : 'нет контента';
+// });
 
 
-morgan.token('body-content', (request) => {
-  console.log('Body content:', request.body.content); 
-  return request.body.content ? request.body.content : 'нет контента';
-});
-
-
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms - body-content: :body-content'));
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms - body-content: :body-content'));
 
 let notes = [
   {
@@ -52,11 +52,11 @@ app.get('/api/notes/:id', (request, response) => {
 });
 
 app.delete('/api/notes/:id', (request, response) => {
-  const id = request.params.id;
-  notes = notes.filter(note => note.id !== id);
+  const id = request.params.id
+  notes = notes.filter(note => note.id !== id)
 
-  response.status(404).end();   
-});
+  response.status(204).end()
+})
 
 const generateId = () => {
   const maxId = notes.length > 0
@@ -83,7 +83,7 @@ app.post('/api/notes', (request, response) => {
     important: Boolean(body.important) || false,
   };
 
-  notes.concat(newNote);
+  notes=notes.concat(newNote);
   response.json(newNote);
 });
 
