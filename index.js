@@ -1,3 +1,5 @@
+require('dotenv').config();
+const Note = require('./models/note')
 const express = require('express');
 const app = express();
 // const morgan = require('morgan');
@@ -18,6 +20,7 @@ app.use(express.static('dist'))
 
 
 // app.use(morgan(':method :url :status :res[content-length] - :response-time ms - body-content: :body-content'));
+
 
 let notes = [
   {
@@ -42,13 +45,15 @@ app.get('/', (request, response) => {
 });
 
 app.get('/api/notes', (request, response) => {
-  response.json(notes);   
+  Note.find({}).then(notes=> {
+    response.json(notes);   
+  })
 });
 
 app.get('/api/notes/:id', (request, response) => {
-  const id = request.params.id;
-  const note = notes.find(note => note.id === id);
-  response.json(note);   
+  Note.findById(request.params.id).then(note=>{
+    response.json(note);   
+  })
 });
 
 app.delete('/api/notes/:id', (request, response) => {
@@ -58,12 +63,12 @@ app.delete('/api/notes/:id', (request, response) => {
   response.status(204).end()
 })
 
-const generateId = () => {
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => Number(n.id)))
-    : 0;
-  return (maxId + 1).toString();
-};
+// const generateId = () => {
+//   const maxId = notes.length > 0
+//     ? Math.max(...notes.map(n => Number(n.id)))
+//     : 0;
+//   return (maxId + 1).toString();
+// };
 
 
 app.post('/api/notes', (request, response) => {
@@ -77,17 +82,20 @@ app.post('/api/notes', (request, response) => {
     });
   }
 
-  const newNote = {
-    id: generateId(),
+  const note = new Note({
     content: body.content,
-    important: Boolean(body.important) || false,
-  };
+    important: body.important || false,
+  });
 
-  notes=notes.concat(newNote);
-  response.json(newNote);
-});
+  note.save().then(savedNote =>{
+    response.json(savedNote);
+  });
+})
 
-const PORT = process.env.PORT || 3001;
+
+
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
