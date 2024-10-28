@@ -9,6 +9,6 @@ Content-Type: application/json
 
 {
     
-    "content": "Ensure that everythig still works",
+    "content": "lol",
     "important": true
 }

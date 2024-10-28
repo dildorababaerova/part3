@@ -16,7 +16,10 @@ const requestLogger = (request, response, next) => {
     console.error(error.message)
     if (error.name === 'CastError') {
       return response.status(400).send({error:'malformed id'})
+  } else if (error.name ==='Validation Error') {
+    return response.status(400).json({error: error.message})
   }
+  
   next(error)
   }
   
@@ -44,7 +47,7 @@ app.get('/api/notes', (request, response) => {
   })
 });
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
   const body = request.body;
   
   console.log('Received POST request body:', body); // Дополнительный вывод
@@ -60,9 +63,11 @@ app.post('/api/notes', (request, response) => {
     important: body.important || false,
   });
   
-  note.save().then(savedNote =>{
+  note.save()
+  .then(savedNote =>{
     response.json(savedNote);
-  });
+  })
+  .catch(error => next(error));
 });
 
 app.get('/api/notes/:id', (request, response, next) => {
