@@ -6,8 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1", 
-    "inspect": "nodemon --inspect index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "inspect": "nodemon --inspect index.js",
+    "lint": "eslint ."
   },
   "author": "Didi",
   "license": "MIT",
@@ -19,6 +20,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@stylistic/eslint-plugin-js": "^2.11.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0",
     "nodemon": "^3.1.7"
   }
 }

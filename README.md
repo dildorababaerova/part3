@@ -27,3 +27,7 @@ process.exit(1):
     1 — это код завершения программы. В Unix-подобных системах (и в Node.js) принято использовать код 0 для успешного завершения программы и 1 или другие ненулевые коды для завершения с ошибкой.
 
 When the code is run with the command `node mongo.js yourPassword`, Mongo will add a new document to the database.
+
+`npm install eslint @eslint/js --save-dev`
+`npx eslint --init`
+`npm install --save-dev @stylistic/eslint-plugin-js`
