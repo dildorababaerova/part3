@@ -40,3 +40,7 @@ NB: If you are deploying this application to Fly.io/Render, keep in mind that if
 `npm test -- --test-name-pattern="the first note is about HTTP methods"`
 `npm run test -- --test-name-pattern="notes"`
 `npm install express-async-errors`
+
+### Token authentication
+
+"npm install jsonwebtoken"
